@@ -5,12 +5,12 @@ with open("news.json", "r", encoding="utf-8") as f:
 
 summarized = []
 
-for item in news[:3]:
+for item in news[:5]:
 
     summarized.append({
         "title": item["title"],
         "link": item["link"],
-        "analysis": "This is AI summary test."
+        "analysis": f"Latest logistics news headline: {item['title']}"
     })
 
 with open("summarized_news.json", "w", encoding="utf-8") as f:
