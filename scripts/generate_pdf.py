@@ -3,8 +3,7 @@ from datetime import datetime
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
-    Spacer,
-    PageBreak
+    Spacer
 )
 from reportlab.lib.styles import getSampleStyleSheet
 
@@ -33,12 +32,12 @@ with open("summarized_news.json", "r", encoding="utf-8") as f:
     news_items = json.load(f)
 
 # ======================
-# Executive Summary
+# TOP 5 SUMMARY
 # ======================
 
 story.append(
     Paragraph(
-        "Executive Summary",
+        "TOP 5 SUMMARY",
         styles['Heading1']
     )
 )
@@ -65,10 +64,10 @@ story.append(Spacer(1, 25))
 # ======================
 
 categories = {
-    "Ocean Freight": [],
+    "Express": [],
     "Air Cargo": [],
-    "Warehousing & Automation": [],
-    "Trade & Tariffs": [],
+    "Ocean Freight": [],
+    "AIDC": [],
     "Other Logistics": []
 }
 
@@ -76,23 +75,51 @@ for item in news_items:
 
     title = item["title"].lower()
 
-    if any(word in title for word in ["port", "shipping", "vessel", "container"]):
-        categories["Ocean Freight"].append(item)
+    # Express
+    if any(word in title for word in [
+        "dhl",
+        "fedex",
+        "ups",
+        "express"
+    ]):
+        categories["Express"].append(item)
 
-    elif any(word in title for word in ["air", "cargo", "airline"]):
+    # Air Cargo
+    elif any(word in title for word in [
+        "air",
+        "cargo",
+        "airline",
+        "aviation"
+    ]):
         categories["Air Cargo"].append(item)
 
-    elif any(word in title for word in ["warehouse", "robot", "automation", "ai"]):
-        categories["Warehousing & Automation"].append(item)
+    # Ocean Freight
+    elif any(word in title for word in [
+        "ocean",
+        "shipping",
+        "vessel",
+        "container",
+        "port"
+    ]):
+        categories["Ocean Freight"].append(item)
 
-    elif any(word in title for word in ["tariff", "trade", "customs"]):
-        categories["Trade & Tariffs"].append(item)
+    # AIDC
+    elif any(word in title for word in [
+        "ai",
+        "automation",
+        "robot",
+        "warehouse",
+        "rfid",
+        "barcode"
+    ]):
+        categories["AIDC"].append(item)
 
+    # Other
     else:
         categories["Other Logistics"].append(item)
 
 # ======================
-# Categorized News
+# CATEGORY SECTIONS
 # ======================
 
 for category, items in categories.items():
@@ -111,6 +138,7 @@ for category, items in categories.items():
 
     for item in items:
 
+        # Title
         story.append(
             Paragraph(
                 item["title"],
@@ -118,6 +146,7 @@ for category, items in categories.items():
             )
         )
 
+        # Summary
         story.append(
             Paragraph(
                 item["analysis"],
@@ -125,7 +154,24 @@ for category, items in categories.items():
             )
         )
 
-        story.append(Spacer(1, 15))
+        # Link
+        link_html = f'''
+        <font color="blue">
+        Source Link:
+        <a href="{item["link"]}">
+        {item["link"]}
+        </a>
+        </font>
+        '''
+
+        story.append(
+            Paragraph(
+                link_html,
+                styles['BodyText']
+            )
+        )
+
+        story.append(Spacer(1, 18))
 
 doc.build(story)
 
