@@ -1,38 +1,21 @@
+import os
 import json
 import google.generativeai as genai
-import os
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+api_key = os.getenv("GEMINI_API_KEY")
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+print("API KEY EXISTS:", bool(api_key))
 
-with open("news.json", "r", encoding="utf-8") as f:
-    news = json.load(f)
+genai.configure(api_key=api_key)
 
-summarized = []
+models = genai.list_models()
 
-for item in news[:5]:
+output = []
 
-    prompt = f"""
-    Summarize this logistics/AIDC news in Traditional Chinese.
-
-    Title:
-    {item['title']}
-
-    Provide:
-    1. Summary
-    2. Market impact
-    """
-
-    response = model.generate_content(prompt)
-
-    summarized.append({
-        "title": item["title"],
-        "link": item["link"],
-        "analysis": response.text
-    })
+for m in models:
+    output.append(str(m.name))
 
 with open("summarized_news.json", "w", encoding="utf-8") as f:
-    json.dump(summarized, f, ensure_ascii=False, indent=2)
+    json.dump(output, f, ensure_ascii=False, indent=2)
 
-print("summarized_news.json generated")
+print("Gemini test success")
