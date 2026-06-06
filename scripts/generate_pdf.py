@@ -12,6 +12,17 @@ from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.styles import ParagraphStyle
 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+
+# =========================================
+# REGISTER CHINESE FONT
+# =========================================
+
+pdfmetrics.registerFont(
+    UnicodeCIDFont('STSong-Light')
+)
+
 # =========================================
 # PDF SETTINGS
 # =========================================
@@ -33,6 +44,7 @@ styles = getSampleStyleSheet()
 title_style = ParagraphStyle(
     'TitleStyle',
     parent=styles['Title'],
+    fontName='STSong-Light',
     fontSize=24,
     leading=30,
     alignment=TA_CENTER,
@@ -43,6 +55,7 @@ title_style = ParagraphStyle(
 section_style = ParagraphStyle(
     'SectionStyle',
     parent=styles['Heading1'],
+    fontName='STSong-Light',
     fontSize=16,
     leading=22,
     textColor=colors.HexColor("#12355B"),
@@ -52,6 +65,7 @@ section_style = ParagraphStyle(
 body_style = ParagraphStyle(
     'BodyStyle',
     parent=styles['BodyText'],
+    fontName='STSong-Light',
     fontSize=10,
     leading=16
 )
