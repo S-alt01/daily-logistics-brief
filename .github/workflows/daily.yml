@@ -12,15 +12,20 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Install dependencies
         run: pip install -r requirements.txt
-        
+
+      - name: Fetch RSS news
+        run: python scripts/fetch_news.py
+
       - name: Summarize news
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -36,6 +41,6 @@ jobs:
 
           git add .
 
-          git commit -m "Update PDF" || echo "No changes"
+          git commit -m "Update daily brief" || echo "No changes"
 
           git push
