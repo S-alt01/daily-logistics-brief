@@ -70,7 +70,7 @@ for i, item in enumerate(news_items[:5], start=1):
 story.append(Spacer(1, 25))
 
 # =========================================
-# KEY MARKET SIGNALS
+# DYNAMIC KEY MARKET SIGNALS
 # =========================================
 
 story.append(
@@ -82,13 +82,95 @@ story.append(
 
 story.append(Spacer(1, 12))
 
-signals = [
-    "• Port congestion pressure remains elevated",
-    "• Air cargo demand continues stabilizing",
-    "• Warehouse automation investment increasing",
-    "• Trade policy uncertainty remains a market risk",
-    "• Express carriers continue regional expansion"
-]
+signals = []
+
+all_titles = " ".join(
+    [item["title"].lower() for item in news_items]
+)
+
+# =====================================
+# EXPRESS
+# =====================================
+
+if any(word in all_titles for word in [
+    "dhl",
+    "fedex",
+    "ups",
+    "express",
+    "parcel",
+    "courier",
+    "last mile"
+]):
+    signals.append(
+        "• Express competition continues intensifying"
+    )
+
+# =====================================
+# AIR CARGO
+# =====================================
+
+if any(word in all_titles for word in [
+    "air cargo",
+    "air freight",
+    "aviation"
+]):
+    signals.append(
+        "• Air cargo demand remains active"
+    )
+
+# =====================================
+# OCEAN FREIGHT
+# =====================================
+
+if any(word in all_titles for word in [
+    "port",
+    "shipping",
+    "container",
+    "vessel",
+    "ocean freight"
+]):
+    signals.append(
+        "• Ocean freight market volatility remains elevated"
+    )
+
+# =====================================
+# AIDC
+# =====================================
+
+if any(word in all_titles for word in [
+    "automation",
+    "robot",
+    "warehouse",
+    "rfid",
+    "barcode",
+    "ai"
+]):
+    signals.append(
+        "• Warehouse automation investment continues accelerating"
+    )
+
+# =====================================
+# TRADE
+# =====================================
+
+if any(word in all_titles for word in [
+    "tariff",
+    "trade",
+    "customs"
+]):
+    signals.append(
+        "• Trade policy uncertainty remains a key market risk"
+    )
+
+# =====================================
+# FALLBACK
+# =====================================
+
+if not signals:
+
+    signals.append(
+        "• Logistics market conditions remain stable"
+    )
 
 for signal in signals:
 
@@ -195,7 +277,10 @@ for category, items in categories.items():
 
     story.append(Spacer(1, 15))
 
-    # 如果没有内容
+    # =====================================
+    # NIL IF EMPTY
+    # =====================================
+
     if not items:
 
         story.append(
