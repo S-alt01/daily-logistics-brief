@@ -21,15 +21,20 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Run fetch script
+      - name: Fetch RSS news
         run: python scripts/fetch_news.py
+
+      - name: Summarize news
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python scripts/summarize_news.py
 
       - name: Commit generated files
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
 
-          git add news.json
+          git add news.json summarized_news.json
 
           git commit -m "Update news" || echo "No changes"
 
