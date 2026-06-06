@@ -1,4 +1,4 @@
-name: Daily Logistics Brief
+name: Daily Logistics Intelligence Brief
 
 on:
   schedule:
@@ -6,9 +6,6 @@ on:
     - cron: '0 23 * * *'
 
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -39,40 +36,67 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install feedparser reportlab
+          pip install feedparser reportlab requests
 
       # =========================================
       # Fetch RSS News
       # =========================================
 
-      - name: Fetch RSS news
-        run: python scripts/fetch_news.py
+      - name: Fetch news
+        run: |
+          python scripts/fetch_news.py
 
       # =========================================
       # Summarize News
       # =========================================
 
       - name: Summarize news
-        run: python scripts/summarize_news.py
+        run: |
+          python scripts/summarize_news.py
 
       # =========================================
       # Generate PDF
       # =========================================
 
       - name: Generate PDF
-        run: python scripts/generate_pdf.py
-
-      # =========================================
-      # Commit Generated Files
-      # =========================================
-
-      - name: Commit generated files
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
+          python scripts/generate_pdf.py
 
-          git add .
+      # =========================================
+      # Upload PDF Artifact
+      # =========================================
 
-          git commit -m "Daily logistics brief update" || echo "No changes"
+      - name: Upload PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-logistics-brief
+          path: daily_brief.pdf
 
-          git push
+      # =========================================
+      # Send PDF via Resend
+      # =========================================
+
+      - name: Send PDF email via Resend
+        run: |
+          python <<EOF
+          import requests
+          import base64
+
+          url = "https://api.resend.com/emails"
+
+          headers = {
+              "Authorization": "Bearer ${{ secrets.RESEND_API_KEY }}",
+              "Content-Type": "application/json"
+          }
+
+          with open("daily_brief.pdf", "rb") as f:
+              pdf_data = f.read()
+
+          encoded_pdf = base64.b64encode(pdf_data).decode("utf-8")
+
+          payload = {
+              "from": "onboarding@resend.dev",
+              "to": ["yuanrandeng@aliyun.com"],
+              "subject": "Daily Logistics Intelligence Brief",
+              "html": """
+              <h2>
