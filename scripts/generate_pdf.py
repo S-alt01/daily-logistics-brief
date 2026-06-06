@@ -22,16 +22,23 @@ with open("summarized_news.json", "r", encoding="utf-8") as f:
 
 for item in news_items[:3]:
 
+    title = str(item["title"]).encode("latin-1", "ignore").decode("latin-1")
+
+    analysis = str(item["analysis"]).encode(
+        "latin-1",
+        "ignore"
+    ).decode("latin-1")
+
     story.append(
         Paragraph(
-            item["title"],
+            title,
             styles['Heading2']
         )
     )
 
     story.append(
         Paragraph(
-            item["analysis"],
+            analysis,
             styles['BodyText']
         )
     )
