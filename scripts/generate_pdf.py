@@ -12,8 +12,6 @@ from reportlab.lib.styles import (
 )
 
 from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 
@@ -41,18 +39,6 @@ doc = SimpleDocTemplate(
 styles = getSampleStyleSheet()
 
 # =========================================
-# English Styles
-# =========================================
-
-title_style = styles['Title']
-
-heading_style = styles['Heading2']
-
-body_style = styles['BodyText']
-
-body_style.leading = 18
-
-# =========================================
 # Chinese Style
 # =========================================
 
@@ -60,18 +46,6 @@ chinese_style = ParagraphStyle(
     'Chinese',
     parent=styles['BodyText'],
     fontName='STSong-Light',
-    fontSize=10,
-    leading=16,
-)
-
-# =========================================
-# Key Signal Style
-# =========================================
-
-signal_style = ParagraphStyle(
-    'Signal',
-    parent=styles['BodyText'],
-    textColor=colors.darkblue,
     fontSize=10,
     leading=16,
 )
@@ -89,11 +63,11 @@ story = []
 story.append(
     Paragraph(
         "Daily Logistics Intelligence Brief",
-        title_style
+        styles['Title']
     )
 )
 
-story.append(Spacer(1, 24))
+story.append(Spacer(1, 20))
 
 # =========================================
 # Load News
@@ -114,7 +88,7 @@ with open(
 story.append(
     Paragraph(
         "TOP 5 KEY SIGNALS",
-        heading_style
+        styles['Heading2']
     )
 )
 
@@ -130,13 +104,13 @@ for item in news_items[:5]:
     story.append(
         Paragraph(
             f"• {signal}",
-            signal_style
+            styles['BodyText']
         )
     )
 
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
-story.append(Spacer(1, 24))
+story.append(Spacer(1, 20))
 
 # =========================================
 # Categories
@@ -159,26 +133,19 @@ for category in categories:
     story.append(
         Paragraph(
             category,
-            heading_style
+            styles['Heading2']
         )
     )
 
     story.append(Spacer(1, 12))
 
-    category_items = []
-
-    for item in news_items:
-
-        item_category = item.get(
-            "category",
-            "Other Logistics"
-        )
-
-        if item_category == category:
-            category_items.append(item)
+    category_items = [
+        item for item in news_items
+        if item.get("category") == category
+    ]
 
     # =====================================
-    # If No News
+    # No News
     # =====================================
 
     if not category_items:
@@ -186,7 +153,7 @@ for category in categories:
         story.append(
             Paragraph(
                 "Nil",
-                body_style
+                styles['BodyText']
             )
         )
 
@@ -200,42 +167,26 @@ for category in categories:
 
     for item in category_items:
 
-        title = item.get(
-            "title",
-            "Untitled News"
-        )
-
-        analysis = item.get(
-            "analysis",
-            "No analysis available."
-        )
-
-        chinese_summary = item.get(
-            "chinese_summary",
-            ""
-        )
-
-        link = item.get(
-            "link",
-            ""
-        )
-
-        # =================================
         # Title
-        # =================================
 
         story.append(
             Paragraph(
-                title,
-                heading_style
+                item.get(
+                    "title",
+                    "Untitled News"
+                ),
+                styles['Heading3']
             )
         )
 
         story.append(Spacer(1, 6))
 
-        # =================================
         # Chinese Summary
-        # =================================
+
+        chinese_summary = item.get(
+            "chinese_summary",
+            ""
+        )
 
         if chinese_summary:
 
@@ -248,33 +199,37 @@ for category in categories:
 
             story.append(Spacer(1, 8))
 
-        # =================================
-        # English Analysis
-        # =================================
+        # Analysis
 
         story.append(
             Paragraph(
-                analysis,
-                body_style
+                item.get(
+                    "analysis",
+                    "No analysis available."
+                ),
+                styles['BodyText']
             )
         )
 
         story.append(Spacer(1, 8))
 
-        # =================================
         # Link
-        # =================================
+
+        link = item.get(
+            "link",
+            ""
+        )
 
         if link:
 
             story.append(
                 Paragraph(
                     f"<font color='blue'>{link}</font>",
-                    body_style
+                    styles['BodyText']
                 )
             )
 
-            story.append(Spacer(1, 20))
+        story.append(Spacer(1, 20))
 
 # =========================================
 # Build PDF
