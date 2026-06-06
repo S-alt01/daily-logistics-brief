@@ -14,10 +14,19 @@ summarized = []
 for item in news[:3]:
 
     prompt = f"""
-    请用繁体中文总结以下新闻，并说明市场影响：
+请用简体中文简短总结下面新闻。
 
-    {item['title']}
-    """
+不要使用：
+- emoji
+- markdown
+- 项目符号
+- 特殊符号
+
+只输出纯文字。
+
+新闻标题：
+{item['title']}
+"""
 
     response = model.generate_content(prompt)
 
