@@ -4,8 +4,7 @@ from datetime import datetime
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
-    Spacer,
-    PageBreak
+    Spacer
 )
 
 from reportlab.lib.styles import getSampleStyleSheet
@@ -87,12 +86,8 @@ story = []
 today = datetime.today().strftime("%Y-%m-%d")
 
 # =========================================
-# COVER PAGE
+# TITLE
 # =========================================
-
-story.append(
-    Spacer(1, 180)
-)
 
 story.append(
     Paragraph(
@@ -108,18 +103,7 @@ story.append(
     )
 )
 
-story.append(
-    Spacer(1, 30)
-)
-
-story.append(
-    Paragraph(
-        "Executive Supply Chain & Logistics Intelligence",
-        body_style
-    )
-)
-
-story.append(PageBreak())
+story.append(Spacer(1, 25))
 
 # =========================================
 # LOAD NEWS
@@ -130,7 +114,7 @@ with open("summarized_news.json", "r", encoding="utf-8") as f:
     news_items = json.load(f)
 
 # =========================================
-# EXECUTIVE SUMMARY
+# TOP 5 SUMMARY
 # =========================================
 
 story.append(
