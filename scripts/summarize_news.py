@@ -1,90 +1,153 @@
 import json
-import re
 
-with open("news.json", "r", encoding="utf-8") as f:
+# =========================================
+# Load RSS News
+# =========================================
+
+with open(
+    "news.json",
+    "r",
+    encoding="utf-8"
+) as f:
+
     news = json.load(f)
 
 summarized = []
 
-for item in news:
+# =========================================
+# Categorization Function
+# =========================================
 
-    title = item["title"]
+def categorize(title):
 
-    clean_summary = re.sub(
-        '<.*?>',
-        '',
-        item.get("summary", "")
-    )
-
-    clean_summary = clean_summary.strip()
-
-    title_lower = title.lower()
+    t = title.lower()
 
     # =====================================
-    # SIMPLE CHINESE SUMMARY
+    # Express
     # =====================================
 
-    chinese_summary = "物流行业出现新的市场动态。"
-
-    if any(word in title_lower for word in [
+    if any(keyword in t for keyword in [
         "dhl",
         "fedex",
         "ups",
         "express",
         "parcel"
     ]):
-        chinese_summary = "国际快递与包裹业务持续扩张。"
+        return "Express"
 
-    elif any(word in title_lower for word in [
+    # =====================================
+    # Air Cargo
+    # =====================================
+
+    elif any(keyword in t for keyword in [
         "air cargo",
-        "air freight",
-        "aviation"
+        "cargo airline",
+        "freighter",
+        "iata",
+        "air freight"
     ]):
-        chinese_summary = "航空货运市场需求保持活跃。"
+        return "Air Cargo"
 
-    elif any(word in title_lower for word in [
+    # =====================================
+    # Ocean Freight
+    # =====================================
+
+    elif any(keyword in t for keyword in [
+        "ocean",
         "shipping",
         "container",
-        "port",
+        "maersk",
+        "msc",
+        "freight rate",
         "vessel"
     ]):
-        chinese_summary = "海运与港口市场波动持续。"
+        return "Ocean Freight"
 
-    elif any(word in title_lower for word in [
+    # =====================================
+    # AIDC
+    # =====================================
+
+    elif any(keyword in t for keyword in [
+        "rfid",
+        "barcode",
+        "scanner",
         "automation",
-        "warehouse",
-        "robot",
-        "ai",
-        "rfid"
+        "warehouse robot",
+        "aidc"
     ]):
-        chinese_summary = "物流自动化与智能仓储投资持续增长。"
+        return "AIDC"
 
     # =====================================
-    # EXECUTIVE ANALYSIS
+    # Other Logistics
     # =====================================
 
-    analysis = f"""
-This development reflects ongoing changes across the logistics,
-transportation, and supply chain sector.
+    else:
+        return "Other Logistics"
 
-Key implications may include freight capacity shifts,
-operational adjustments, supply chain efficiency impact,
-and changing regional market conditions.
+# =========================================
+# Generate Summary
+# =========================================
 
-Summary:
-{clean_summary}
-"""
+for item in news[:50]:
+
+    title = item.get(
+        "title",
+        "Untitled News"
+    )
+
+    link = item.get(
+        "link",
+        ""
+    )
+
+    category = categorize(title)
+
+    # =====================================
+    # Analysis
+    # =====================================
+
+    analysis = (
+        f"This development may influence "
+        f"{category.lower()} market dynamics, "
+        f"capacity planning, and supply chain operations."
+    )
+
+    # =====================================
+    # Chinese Summary
+    # =====================================
+
+    chinese_summary = (
+        f"该新闻与{category}行业相关，"
+        f"可能影响未来物流市场、运力及供应链变化。"
+    )
+
+    # =====================================
+    # Key Signal
+    # =====================================
+
+    key_signal = (
+        f"{category} sector continues to show "
+        f"strategic market movement."
+    )
 
     summarized.append({
 
         "title": title,
 
+        "link": link,
+
+        "category": category,
+
+        "analysis": analysis,
+
         "chinese_summary": chinese_summary,
 
-        "link": item["link"],
-
-        "analysis": analysis
+        "key_signal": key_signal
     })
+
+# =========================================
+# Save Output
+# =========================================
 
 with open(
     "summarized_news.json",
