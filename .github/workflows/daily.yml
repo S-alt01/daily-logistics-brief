@@ -77,40 +77,44 @@ jobs:
       # =========================================
 
       - name: Send PDF email via Resend
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
-          python -c "
-import requests
-import base64
+          python <<EOF
+          import requests
+          import base64
+          import os
 
-with open('daily_brief.pdf', 'rb') as f:
-    pdf_data = f.read()
+          with open("daily_brief.pdf", "rb") as f:
+              pdf_data = f.read()
 
-encoded_pdf = base64.b64encode(pdf_data).decode('utf-8')
+          encoded_pdf = base64.b64encode(pdf_data).decode("utf-8")
 
-headers = {
-    'Authorization': 'Bearer ${{ secrets.RESEND_API_KEY }}',
-    'Content-Type': 'application/json'
-}
+          headers = {
+              "Authorization": f"Bearer {os.environ['RESEND_API_KEY']}",
+              "Content-Type": "application/json"
+          }
 
-payload = {
-    'from': 'onboarding@resend.dev',
-    'to': ['yuanrandeng@aliyun.com'],
-    'subject': 'Daily Logistics Intelligence Brief',
-    'html': '<h2>Daily Logistics Intelligence Brief</h2><p>Attached is today\\'s PDF report.</p>',
-    'attachments': [
-        {
-            'filename': 'daily_brief.pdf',
-            'content': encoded_pdf
-        }
-    ]
-}
+          payload = {
+              "from": "onboarding@resend.dev",
+              "to": ["yuanrandeng@aliyun.com"],
+              "subject": "Daily Logistics Intelligence Brief",
+              "html": "<h2>Daily Logistics Intelligence Brief</h2><p>Attached is today's PDF report.</p>",
+              "attachments": [
+                  {
+                      "filename": "daily_brief.pdf",
+                      "content": encoded_pdf
+                  }
+              ]
+          }
 
-response = requests.post(
-    'https://api.resend.com/emails',
-    headers=headers,
-    json=payload
-)
+          response = requests.post(
+              "https://api.resend.com/emails",
+              headers=headers,
+              json=payload
+          )
 
-print(response.status_code)
-print(response.text)
-"
+          print(response.status_code)
+          print(response.text)
+
+          EOF
