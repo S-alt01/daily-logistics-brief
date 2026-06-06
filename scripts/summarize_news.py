@@ -1,27 +1,17 @@
 import json
-import os
-
-from google import genai
-
-client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
 
 with open("news.json", "r", encoding="utf-8") as f:
     news = json.load(f)
 
-item = news[0]
+summarized = []
 
-response = client.models.generate_content(
-    model="gemini-2.0-flash",
-    contents=f"Summarize this logistics news in simple English: {item['title']}"
-)
+for item in news[:3]:
 
-summarized = [{
-    "title": item["title"],
-    "link": item["link"],
-    "analysis": response.text
-}]
+    summarized.append({
+        "title": item["title"],
+        "link": item["link"],
+        "analysis": "This is AI summary test."
+    })
 
 with open("summarized_news.json", "w", encoding="utf-8") as f:
     json.dump(summarized, f, ensure_ascii=False, indent=2)
