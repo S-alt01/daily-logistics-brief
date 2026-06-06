@@ -26,6 +26,16 @@ for item in news_items[:3]:
 
     analysis = str(item.get("analysis", ""))
 
+    title = title.encode(
+        "latin-1",
+        "ignore"
+    ).decode("latin-1")
+
+    analysis = analysis.encode(
+        "latin-1",
+        "ignore"
+    ).decode("latin-1")
+
     story.append(
         Paragraph(
             title,
