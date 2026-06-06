@@ -20,7 +20,7 @@ story.append(Spacer(1, 20))
 with open("summarized_news.json", "r", encoding="utf-8") as f:
     news_items = json.load(f)
 
-for item in news_items[:3]:
+for item in news_items:
 
     story.append(
         Paragraph(
