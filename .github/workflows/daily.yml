@@ -4,27 +4,18 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
 
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      - run: python --version
 
-      - name: Run fetch script
-        run: |
-          python scripts/fetch_news.py
+      - run: echo "hello" > test.txt
 
-      - name: Show generated files
-        run: |
-          ls -la
+      - run: ls -la
