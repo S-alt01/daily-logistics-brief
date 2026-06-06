@@ -1,4 +1,5 @@
 import json
+import feedparser
 
 # =========================================
 # Load RSS News
@@ -10,89 +11,107 @@ with open(
     encoding="utf-8"
 ) as f:
 
-    news = json.load(f)
-
-summarized = []
+    news_items = json.load(f)
 
 # =========================================
-# Categorization Function
+# Output List
 # =========================================
 
-def categorize(title):
+summarized_news = []
 
-    t = title.lower()
+# =========================================
+# Category Function
+# =========================================
 
-    # =====================================
+def categorize_news(title):
+
+    title_lower = title.lower()
+
     # Express
-    # =====================================
 
-    if any(keyword in t for keyword in [
-        "dhl",
+    if any(keyword in title_lower for keyword in [
         "fedex",
         "ups",
-        "express",
-        "parcel"
+        "dhl",
+        "parcel",
+        "delivery",
+        "express"
     ]):
+
         return "Express"
 
-    # =====================================
     # Air Cargo
-    # =====================================
 
-    elif any(keyword in t for keyword in [
+    elif any(keyword in title_lower for keyword in [
         "air cargo",
+        "air freight",
         "cargo airline",
-        "freighter",
-        "iata",
-        "air freight"
+        "aviation",
+        "freighter"
     ]):
+
         return "Air Cargo"
 
-    # =====================================
     # Ocean Freight
-    # =====================================
 
-    elif any(keyword in t for keyword in [
+    elif any(keyword in title_lower for keyword in [
         "ocean",
         "shipping",
         "container",
-        "maersk",
-        "msc",
-        "freight rate",
-        "vessel"
+        "port",
+        "vessel",
+        "freight"
     ]):
+
         return "Ocean Freight"
 
-    # =====================================
     # AIDC
-    # =====================================
 
-    elif any(keyword in t for keyword in [
-        "rfid",
-        "barcode",
-        "scanner",
+    elif any(keyword in title_lower for keyword in [
+        "ai",
         "automation",
-        "warehouse robot",
-        "aidc"
+        "robot",
+        "warehouse",
+        "technology",
+        "digital"
     ]):
+
         return "AIDC"
 
-    # =====================================
-    # Other Logistics
-    # =====================================
+    # Default
 
     else:
+
         return "Other Logistics"
 
 # =========================================
-# Generate Summary
+# Generate Key Signal
 # =========================================
 
-for item in news[:50]:
+def generate_key_signal(category):
+
+    signals = {
+        "Express": "Express delivery demand and parcel competition continue evolving.",
+        "Air Cargo": "Air cargo market conditions continue shifting globally.",
+        "Ocean Freight": "Ocean freight and shipping market volatility remains elevated.",
+        "AIDC": "Logistics automation and digital supply chain investment continue growing.",
+        "Other Logistics": "Broader logistics market conditions remain dynamic."
+    }
+
+    return signals.get(
+        category,
+        "Logistics market conditions remain dynamic."
+    )
+
+# =========================================
+# Process News
+# =========================================
+
+for item in news_items:
 
     title = item.get(
         "title",
-        "Untitled News"
+        "No title"
     )
 
     link = item.get(
@@ -100,53 +119,78 @@ for item in news[:50]:
         ""
     )
 
-    category = categorize(title)
-
-    # =====================================
-    # Analysis
-    # =====================================
-
-    analysis = (
-        f"This development may influence "
-        f"{category.lower()} market dynamics, "
-        f"capacity planning, and supply chain operations."
+    summary = item.get(
+        "summary",
+        ""
     )
 
     # =====================================
-    # Chinese Summary
+    # Category
     # =====================================
 
-    chinese_summary = (
-        f"该新闻与{category}行业相关，"
-        f"可能影响未来物流市场、运力及供应链变化。"
-    )
+    category = categorize_news(title)
 
     # =====================================
     # Key Signal
     # =====================================
 
-    key_signal = (
-        f"{category} sector continues to show "
-        f"strategic market movement."
+    key_signal = generate_key_signal(category)
+
+    # =====================================
+    # Chinese Summary
+    # =====================================
+
+    chinese_summary_map = {
+        "Express": "快递与包裹市场竞争持续加剧。",
+        "Air Cargo": "全球航空货运市场持续波动。",
+        "Ocean Freight": "海运与港口市场波动持续。",
+        "AIDC": "物流自动化与智能仓储投资持续增长。",
+        "Other Logistics": "物流行业出现新的市场动态。"
+    }
+
+    chinese_summary = chinese_summary_map.get(
+        category,
+        "物流行业出现新的市场动态。"
     )
 
-    summarized.append({
+    # =====================================
+    # Analysis
+    # =====================================
+
+    analysis = f"""
+This development reflects ongoing changes across the logistics,
+transportation, and supply chain sector.
+
+Key implications may include freight capacity shifts,
+operational adjustments, supply chain efficiency impact,
+and changing regional market conditions.
+
+Summary:
+{summary}
+"""
+
+    # =====================================
+    # Append
+    # =====================================
+
+    summarized_news.append({
 
         "title": title,
 
-        "link": link,
-
         "category": category,
 
-        "analysis": analysis,
+        "key_signal": key_signal,
 
         "chinese_summary": chinese_summary,
 
-        "key_signal": key_signal
+        "link": link,
+
+        "analysis": analysis
+
     })
 
 # =========================================
-# Save Output
+# Save JSON
 # =========================================
 
 with open(
@@ -156,10 +200,10 @@ with open(
 ) as f:
 
     json.dump(
-        summarized,
+        summarized_news,
         f,
         ensure_ascii=False,
         indent=2
     )
 
-print("summarized_news.json generated")
+print("News summarized successfully")
