@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 from reportlab.platypus import (
     SimpleDocTemplate,
@@ -7,16 +6,19 @@ from reportlab.platypus import (
     Spacer
 )
 
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import (
+    getSampleStyleSheet,
+    ParagraphStyle
+)
+
+from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.styles import ParagraphStyle
 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 
 # =========================================
-# REGISTER CHINESE FONT
+# Register Chinese Font
 # =========================================
 
 pdfmetrics.registerFont(
@@ -24,83 +26,64 @@ pdfmetrics.registerFont(
 )
 
 # =========================================
-# PDF SETTINGS
+# PDF Setup
 # =========================================
 
 doc = SimpleDocTemplate(
     "daily_brief.pdf",
-    rightMargin=45,
-    leftMargin=45,
-    topMargin=45,
-    bottomMargin=40
+    pagesize=letter,
+    rightMargin=40,
+    leftMargin=40,
+    topMargin=40,
+    bottomMargin=28
 )
 
 styles = getSampleStyleSheet()
 
 # =========================================
-# CUSTOM STYLES
+# English Styles
 # =========================================
 
-title_style = ParagraphStyle(
-    'TitleStyle',
-    parent=styles['Title'],
-    fontName='STSong-Light',
-    fontSize=24,
-    leading=30,
-    alignment=TA_CENTER,
-    textColor=colors.HexColor("#0B1F3A"),
-    spaceAfter=30
-)
+title_style = styles['Title']
 
-section_style = ParagraphStyle(
-    'SectionStyle',
-    parent=styles['Heading1'],
-    fontName='STSong-Light',
-    fontSize=16,
-    leading=22,
-    textColor=colors.HexColor("#12355B"),
-    spaceAfter=12
-)
+heading_style = styles['Heading2']
 
-body_style = ParagraphStyle(
-    'BodyStyle',
+body_style = styles['BodyText']
+
+body_style.leading = 18
+
+# =========================================
+# Chinese Style
+# =========================================
+
+chinese_style = ParagraphStyle(
+    'Chinese',
     parent=styles['BodyText'],
     fontName='STSong-Light',
     fontSize=10,
-    leading=16
+    leading=16,
 )
 
 # =========================================
-# PAGE FOOTER
+# Key Signal Style
 # =========================================
 
-def add_page_number(canvas, doc):
-
-    page_num = canvas.getPageNumber()
-
-    footer_text = (
-        f"Daily Logistics Intelligence Brief | "
-        f"Page {page_num}"
-    )
-
-    canvas.setFont("Helvetica", 8)
-
-    canvas.drawRightString(
-        550,
-        20,
-        footer_text
-    )
+signal_style = ParagraphStyle(
+    'Signal',
+    parent=styles['BodyText'],
+    textColor=colors.darkblue,
+    fontSize=10,
+    leading=16,
+)
 
 # =========================================
-# STORY
+# Build Story
 # =========================================
 
 story = []
 
-today = datetime.today().strftime("%Y-%m-%d")
-
 # =========================================
-# TITLE
+# Title
 # =========================================
 
 story.append(
@@ -110,190 +93,56 @@ story.append(
     )
 )
 
-story.append(
-    Paragraph(
-        today,
-        styles['Heading2']
-    )
-)
-
-story.append(Spacer(1, 25))
+story.append(Spacer(1, 24))
 
 # =========================================
-# LOAD NEWS
+# Load News
 # =========================================
 
-with open("summarized_news.json", "r", encoding="utf-8") as f:
+with open(
+    "summarized_news.json",
+    "r",
+    encoding="utf-8"
+) as f:
 
     news_items = json.load(f)
 
 # =========================================
-# TOP 5 SUMMARY
+# TOP 5 Summary
 # =========================================
 
 story.append(
     Paragraph(
-        "TOP 5 SUMMARY",
-        section_style
+        "TOP 5 KEY SIGNALS",
+        heading_style
     )
 )
 
-for i, item in enumerate(news_items[:5], start=1):
+story.append(Spacer(1, 12))
 
-    text = f"<b>{i}.</b> {item['title']}"
+for item in news_items[:5]:
+
+    signal = item.get(
+        "key_signal",
+        "Market momentum remains active."
+    )
 
     story.append(
         Paragraph(
-            text,
-            body_style
+            f"• {signal}",
+            signal_style
         )
     )
 
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 10))
 
-story.append(Spacer(1, 25))
-
-# =========================================
-# DYNAMIC KEY SIGNALS
-# =========================================
-
-story.append(
-    Paragraph(
-        "KEY MARKET SIGNALS",
-        section_style
-    )
-)
-
-signals = []
-
-all_titles = " ".join(
-    [item["title"].lower() for item in news_items]
-)
-
-if any(word in all_titles for word in [
-    "dhl",
-    "fedex",
-    "ups",
-    "express",
-    "parcel"
-]):
-    signals.append(
-        "• Express competition continues intensifying"
-    )
-
-if any(word in all_titles for word in [
-    "air cargo",
-    "air freight",
-    "aviation"
-]):
-    signals.append(
-        "• Air cargo demand remains active"
-    )
-
-if any(word in all_titles for word in [
-    "shipping",
-    "container",
-    "port",
-    "vessel"
-]):
-    signals.append(
-        "• Ocean freight market volatility remains elevated"
-    )
-
-if any(word in all_titles for word in [
-    "automation",
-    "warehouse",
-    "robot",
-    "rfid",
-    "ai"
-]):
-    signals.append(
-        "• Warehouse automation investment accelerating"
-    )
-
-if not signals:
-
-    signals.append(
-        "• Logistics market conditions remain stable"
-    )
-
-for signal in signals:
-
-    story.append(
-        Paragraph(
-            signal,
-            body_style
-        )
-    )
-
-    story.append(Spacer(1, 6))
-
-story.append(Spacer(1, 25))
+story.append(Spacer(1, 24))
 
 # =========================================
-# CATEGORIES
+# Categories
 # =========================================
 
-categories = {
-    "Express": [],
-    "Air Cargo": [],
-    "Ocean Freight": [],
-    "AIDC": [],
-    "Other Logistics": []
-}
-
-for item in news_items:
-
-    title = item["title"].lower()
-
-    # EXPRESS PRIORITY
-    if any(word in title for word in [
-        "dhl",
-        "fedex",
-        "ups",
-        "express",
-        "parcel",
-        "courier",
-        "last mile"
-    ]):
-        categories["Express"].append(item)
-
-    # AIR CARGO
-    elif any(word in title for word in [
-        "air cargo",
-        "air freight",
-        "aviation"
-    ]):
-        categories["Air Cargo"].append(item)
-
-    # OCEAN
-    elif any(word in title for word in [
-        "shipping",
-        "container",
-        "port",
-        "vessel"
-    ]):
-        categories["Ocean Freight"].append(item)
-
-    # AIDC
-    elif any(word in title for word in [
-        "automation",
-        "robot",
-        "warehouse",
-        "rfid",
-        "barcode",
-        "ai"
-    ]):
-        categories["AIDC"].append(item)
-
-    else:
-        categories["Other Logistics"].append(item)
-
-# =========================================
-# SECTION ORDER
-# =========================================
-
-section_order = [
+categories = [
     "Express",
     "Air Cargo",
     "Ocean Freight",
@@ -302,28 +151,34 @@ section_order = [
 ]
 
 # =========================================
-# SECTION CONTENT
+# Generate Sections
 # =========================================
 
-for section in section_order:
+for category in categories:
 
     story.append(
         Paragraph(
-            section.upper(),
-            section_style
+            category,
+            heading_style
         )
     )
 
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 12))
 
-    items = categories[section]
+    category_items = [
+        item for item in news_items
+        if item.get("category") == category
+    ]
 
-    # NIL
-    if not items:
+    # =====================================
+    # If No News
+    # =====================================
+
+    if not category_items:
 
         story.append(
             Paragraph(
-                "NIL",
+                "Nil",
                 body_style
             )
         )
@@ -332,29 +187,43 @@ for section in section_order:
 
         continue
 
-    for item in items[:5]:
+    # =====================================
+    # News Items
+    # =====================================
 
-        # TITLE
+    for item in category_items:
+
+        # Title
+
         story.append(
             Paragraph(
-                f"<b>{item['title']}</b>",
-                styles['Heading2']
-            )
-        )
-
-        story.append(Spacer(1, 5))
-
-        # CHINESE SUMMARY
-        story.append(
-            Paragraph(
-                f"<font color='#444444'><b>中文摘要：</b>{item.get('chinese_summary', '')}</font>",
-                body_style
+                item["title"],
+                heading_style
             )
         )
 
         story.append(Spacer(1, 6))
 
-        # ANALYSIS
+        # Chinese Summary
+
+        chinese_summary = item.get(
+            "chinese_summary",
+            ""
+        )
+
+        if chinese_summary:
+
+            story.append(
+                Paragraph(
+                    chinese_summary,
+                    chinese_style
+                )
+            )
+
+            story.append(Spacer(1, 8))
+
+        # English Analysis
+
         story.append(
             Paragraph(
                 item["analysis"],
@@ -362,21 +231,13 @@ for section in section_order:
             )
         )
 
-        story.append(Spacer(1, 6))
+        story.append(Spacer(1, 8))
 
-        # SOURCE
-        link_html = f'''
-        <font color="#1D4E89">
-        Source:
-        <a href="{item["link"]}">
-        {item["link"]}
-        </a>
-        </font>
-        '''
+        # Link
 
         story.append(
             Paragraph(
-                link_html,
+                f"<font color='blue'>{item['link']}</font>",
                 body_style
             )
         )
@@ -384,13 +245,9 @@ for section in section_order:
         story.append(Spacer(1, 20))
 
 # =========================================
-# BUILD PDF
+# Build PDF
 # =========================================
 
-doc.build(
-    story,
-    onFirstPage=add_page_number,
-    onLaterPages=add_page_number
-)
+doc.build(story)
 
-print("Professional intelligence PDF generated")
+print("Professional PDF generated")
