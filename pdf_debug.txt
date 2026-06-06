@@ -1,1 +1,7 @@
-PDF SUCCESS
+'str' object has no attribute 'get'
+
+Traceback (most recent call last):
+  File "/home/runner/work/daily-logistics-brief/daily-logistics-brief/scripts/generate_pdf.py", line 23, in <module>
+    title = str(first.get("title", "NO TITLE"))
+                ^^^^^^^^^
+AttributeError: 'str' object has no attribute 'get'
