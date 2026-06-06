@@ -7,7 +7,7 @@ feed = feedparser.parse(feed_url)
 
 news = []
 
-for entry in feed.entries[:10]:
+for entry in feed.entries[:50]:
 
     summary = ""
 
