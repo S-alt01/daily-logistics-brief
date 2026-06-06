@@ -7,7 +7,13 @@ from reportlab.platypus import (
 )
 from reportlab.lib.styles import getSampleStyleSheet
 
-doc = SimpleDocTemplate("daily_brief.pdf")
+doc = SimpleDocTemplate(
+    "daily_brief.pdf",
+    rightMargin=40,
+    leftMargin=40,
+    topMargin=40,
+    bottomMargin=30
+)
 
 styles = getSampleStyleSheet()
 
@@ -15,29 +21,33 @@ story = []
 
 today = datetime.today().strftime("%Y-%m-%d")
 
-# ======================
-# Title
-# ======================
+# =========================================
+# TITLE
+# =========================================
 
 story.append(
     Paragraph(
-        f"Daily Logistics & AIDC Brief<br/>{today}",
+        f"Daily Logistics Intelligence Brief<br/>{today}",
         styles['Title']
     )
 )
 
-story.append(Spacer(1, 30))
+story.append(Spacer(1, 25))
+
+# =========================================
+# LOAD NEWS
+# =========================================
 
 with open("summarized_news.json", "r", encoding="utf-8") as f:
     news_items = json.load(f)
 
-# ======================
-# TOP 5 SUMMARY
-# ======================
+# =========================================
+# EXECUTIVE SUMMARY
+# =========================================
 
 story.append(
     Paragraph(
-        "TOP 5 SUMMARY",
+        "EXECUTIVE INTELLIGENCE SUMMARY",
         styles['Heading1']
     )
 )
@@ -46,7 +56,7 @@ story.append(Spacer(1, 15))
 
 for i, item in enumerate(news_items[:5], start=1):
 
-    text = f"{i}. {item['title']}"
+    text = f"<b>{i}.</b> {item['title']}"
 
     story.append(
         Paragraph(
@@ -55,13 +65,47 @@ for i, item in enumerate(news_items[:5], start=1):
         )
     )
 
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 10))
 
 story.append(Spacer(1, 25))
 
-# ======================
-# Categories
-# ======================
+# =========================================
+# KEY MARKET SIGNALS
+# =========================================
+
+story.append(
+    Paragraph(
+        "KEY MARKET SIGNALS",
+        styles['Heading1']
+    )
+)
+
+story.append(Spacer(1, 12))
+
+signals = [
+    "• Port congestion pressure remains elevated",
+    "• Air cargo demand continues stabilizing",
+    "• Warehouse automation investment increasing",
+    "• Trade policy uncertainty remains a market risk",
+    "• Express carriers continue regional expansion"
+]
+
+for signal in signals:
+
+    story.append(
+        Paragraph(
+            signal,
+            styles['BodyText']
+        )
+    )
+
+    story.append(Spacer(1, 6))
+
+story.append(Spacer(1, 25))
+
+# =========================================
+# CATEGORIES
+# =========================================
 
 categories = {
     "Express": [],
@@ -114,13 +158,13 @@ for item in news_items:
     ]):
         categories["AIDC"].append(item)
 
-    # Other
+    # Other Logistics
     else:
         categories["Other Logistics"].append(item)
 
-# ======================
+# =========================================
 # CATEGORY SECTIONS
-# ======================
+# =========================================
 
 for category, items in categories.items():
 
@@ -129,22 +173,24 @@ for category, items in categories.items():
 
     story.append(
         Paragraph(
-            category,
+            category.upper(),
             styles['Heading1']
         )
     )
 
-    story.append(Spacer(1, 12))
+    story.append(Spacer(1, 15))
 
-    for item in items:
+    for item in items[:5]:
 
         # Title
         story.append(
             Paragraph(
-                item["title"],
+                f"<b>{item['title']}</b>",
                 styles['Heading2']
             )
         )
+
+        story.append(Spacer(1, 5))
 
         # Summary
         story.append(
@@ -154,10 +200,28 @@ for category, items in categories.items():
             )
         )
 
-        # Link
+        story.append(Spacer(1, 5))
+
+        # Implication
+        implication = """
+        <i>Implication:</i>
+        This development may influence logistics capacity,
+        supply chain efficiency, and regional freight activity.
+        """
+
+        story.append(
+            Paragraph(
+                implication,
+                styles['BodyText']
+            )
+        )
+
+        story.append(Spacer(1, 5))
+
+        # Source Link
         link_html = f'''
         <font color="blue">
-        Source Link:
+        Source:
         <a href="{item["link"]}">
         {item["link"]}
         </a>
@@ -172,6 +236,38 @@ for category, items in categories.items():
         )
 
         story.append(Spacer(1, 18))
+
+# =========================================
+# WATCHLIST
+# =========================================
+
+story.append(
+    Paragraph(
+        "WATCHLIST",
+        styles['Heading1']
+    )
+)
+
+story.append(Spacer(1, 12))
+
+watch_items = [
+    "• Red Sea shipping developments",
+    "• US-China tariff policy changes",
+    "• Air cargo pricing movement",
+    "• Warehouse robotics adoption trends",
+    "• Global port congestion indicators"
+]
+
+for watch in watch_items:
+
+    story.append(
+        Paragraph(
+            watch,
+            styles['BodyText']
+        )
+    )
+
+    story.append(Spacer(1, 6))
 
 doc.build(story)
 
