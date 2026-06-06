@@ -8,6 +8,8 @@ summarized = []
 
 for item in news:
 
+    title = item["title"]
+
     clean_summary = re.sub(
         '<.*?>',
         '',
@@ -15,6 +17,51 @@ for item in news:
     )
 
     clean_summary = clean_summary.strip()
+
+    title_lower = title.lower()
+
+    # =====================================
+    # SIMPLE CHINESE SUMMARY
+    # =====================================
+
+    chinese_summary = "物流行业出现新的市场动态。"
+
+    if any(word in title_lower for word in [
+        "dhl",
+        "fedex",
+        "ups",
+        "express",
+        "parcel"
+    ]):
+        chinese_summary = "国际快递与包裹业务持续扩张。"
+
+    elif any(word in title_lower for word in [
+        "air cargo",
+        "air freight",
+        "aviation"
+    ]):
+        chinese_summary = "航空货运市场需求保持活跃。"
+
+    elif any(word in title_lower for word in [
+        "shipping",
+        "container",
+        "port",
+        "vessel"
+    ]):
+        chinese_summary = "海运与港口市场波动持续。"
+
+    elif any(word in title_lower for word in [
+        "automation",
+        "warehouse",
+        "robot",
+        "ai",
+        "rfid"
+    ]):
+        chinese_summary = "物流自动化与智能仓储投资持续增长。"
+
+    # =====================================
+    # EXECUTIVE ANALYSIS
+    # =====================================
 
     analysis = f"""
 This development reflects ongoing changes across the logistics,
@@ -29,8 +76,13 @@ Summary:
 """
 
     summarized.append({
-        "title": item["title"],
+
+        "title": title,
+
+        "chinese_summary": chinese_summary,
+
         "link": item["link"],
+
         "analysis": analysis
     })
 
