@@ -12,6 +12,8 @@ from reportlab.lib.styles import (
 )
 
 from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 
@@ -39,6 +41,18 @@ doc = SimpleDocTemplate(
 styles = getSampleStyleSheet()
 
 # =========================================
+# English Styles
+# =========================================
+
+title_style = styles['Title']
+
+heading_style = styles['Heading2']
+
+body_style = styles['BodyText']
+
+body_style.leading = 18
+
+# =========================================
 # Chinese Style
 # =========================================
 
@@ -46,6 +60,18 @@ chinese_style = ParagraphStyle(
     'Chinese',
     parent=styles['BodyText'],
     fontName='STSong-Light',
+    fontSize=10,
+    leading=16,
+)
+
+# =========================================
+# Key Signal Style
+# =========================================
+
+signal_style = ParagraphStyle(
+    'Signal',
+    parent=styles['BodyText'],
+    textColor=colors.darkblue,
     fontSize=10,
     leading=16,
 )
@@ -63,11 +89,11 @@ story = []
 story.append(
     Paragraph(
         "Daily Logistics Intelligence Brief",
-        styles['Title']
+        title_style
     )
 )
 
-story.append(Spacer(1, 20))
+story.append(Spacer(1, 24))
 
 # =========================================
 # Load News
@@ -82,13 +108,13 @@ with open(
     news_items = json.load(f)
 
 # =========================================
-# TOP 5 KEY SIGNALS
+# TOP 5 Summary
 # =========================================
 
 story.append(
     Paragraph(
         "TOP 5 KEY SIGNALS",
-        styles['Heading2']
+        heading_style
     )
 )
 
@@ -98,19 +124,19 @@ for item in news_items[:5]:
 
     signal = item.get(
         "key_signal",
-        "Market conditions remain dynamic."
+        "Market momentum remains active."
     )
 
     story.append(
         Paragraph(
             f"• {signal}",
-            styles['BodyText']
+            signal_style
         )
     )
 
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 10))
 
-story.append(Spacer(1, 20))
+story.append(Spacer(1, 24))
 
 # =========================================
 # Categories
@@ -133,7 +159,7 @@ for category in categories:
     story.append(
         Paragraph(
             category,
-            styles['Heading2']
+            heading_style
         )
     )
 
@@ -145,7 +171,7 @@ for category in categories:
     ]
 
     # =====================================
-    # No News
+    # If No News
     # =====================================
 
     if not category_items:
@@ -153,7 +179,7 @@ for category in categories:
         story.append(
             Paragraph(
                 "Nil",
-                styles['BodyText']
+                body_style
             )
         )
 
@@ -171,11 +197,8 @@ for category in categories:
 
         story.append(
             Paragraph(
-                item.get(
-                    "title",
-                    "Untitled News"
-                ),
-                styles['Heading3']
+                item["title"],
+                heading_style
             )
         )
 
@@ -199,15 +222,12 @@ for category in categories:
 
             story.append(Spacer(1, 8))
 
-        # Analysis
+        # English Analysis
 
         story.append(
             Paragraph(
-                item.get(
-                    "analysis",
-                    "No analysis available."
-                ),
-                styles['BodyText']
+                item["analysis"],
+                body_style
             )
         )
 
@@ -215,19 +235,12 @@ for category in categories:
 
         # Link
 
-        link = item.get(
-            "link",
-            ""
-        )
-
-        if link:
-
-            story.append(
-                Paragraph(
-                    f"<font color='blue'>{link}</font>",
-                    styles['BodyText']
-                )
+        story.append(
+            Paragraph(
+                f"<font color='blue'>{item['link']}</font>",
+                body_style
             )
+        )
 
         story.append(Spacer(1, 20))
 
