@@ -1,57 +1,40 @@
 import json
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
+import traceback
 
-doc = SimpleDocTemplate("daily_brief.pdf")
+try:
 
-styles = getSampleStyleSheet()
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
 
-story = []
+    doc = SimpleDocTemplate("daily_brief.pdf")
 
-story.append(
-    Paragraph(
-        "Daily Logistics & AIDC Brief",
-        styles['Title']
-    )
-)
+    styles = getSampleStyleSheet()
 
-story.append(Spacer(1, 20))
+    story = []
 
-with open("summarized_news.json", "r", encoding="utf-8") as f:
-    news_items = json.load(f)
+    with open("summarized_news.json", "r", encoding="utf-8") as f:
+        news_items = json.load(f)
 
-for item in news_items[:3]:
+    with open("json_dump.txt", "w", encoding="utf-8") as f:
+        f.write(str(news_items[:1]))
 
-    title = str(item.get("title", ""))
+    first = news_items[0]
 
-    analysis = str(item.get("analysis", ""))
+    title = str(first.get("title", "NO TITLE"))
+    analysis = str(first.get("analysis", "NO ANALYSIS"))
 
-    title = title.encode(
-        "latin-1",
-        "ignore"
-    ).decode("latin-1")
-
-    analysis = analysis.encode(
-        "latin-1",
-        "ignore"
-    ).decode("latin-1")
-
-    story.append(
-        Paragraph(
-            title,
-            styles['Heading2']
-        )
-    )
-
-    story.append(
-        Paragraph(
-            analysis,
-            styles['BodyText']
-        )
-    )
-
+    story.append(Paragraph(title, styles['Heading2']))
     story.append(Spacer(1, 20))
+    story.append(Paragraph(analysis, styles['BodyText']))
 
-doc.build(story)
+    doc.build(story)
 
-print("PDF generated")
+    with open("pdf_debug.txt", "w") as f:
+        f.write("PDF SUCCESS")
+
+except Exception as e:
+
+    with open("pdf_debug.txt", "w") as f:
+        f.write(str(e))
+        f.write("\n\n")
+        f.write(traceback.format_exc())
