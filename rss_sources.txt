@@ -1,10 +1,65 @@
+# Air Cargo
 https://www.aircargonews.net/feed/
 https://www.aircargoeye.com/feed/
+https://aircargoweek.com/feed/
+https://www.stattimes.com/rss
+https://simpleflying.com/category/aviation-news/feed/
+https://www.freightwaves.com/news/category/air-cargo/feed
+https://www.payloadasia.com/feed/
+https://www.cargoforwarder.eu/feed/
+
+# Ocean Freight
 https://splash247.com/feed/
-https://www.freightwaves.com/news/feed
 https://www.joc.com/rss.xml
 https://theloadstar.com/feed/
+https://gcaptain.com/feed/
+https://lloydslist.maritimeintelligence.informa.com/rss
+https://www.freightwaves.com/news/category/ocean/feed
+https://www.seatrade-maritime.com/rss.xml
+https://shippingwatch.com/rss
+https://www.hellenicshippingnews.com/feed/
+https://container-news.com/feed/
+
+# Logistics / Supply Chain
+https://www.freightwaves.com/news/feed
 https://www.supplychaindive.com/feeds/news/
+https://www.logisticsmgmt.com/rss/all
+https://www.dcvelocity.com/rss
+https://www.scmr.com/rss
+https://www.inboundlogistics.com/rss.xml
+https://www.globaltrademag.com/feed/
+https://www.logisticsmanager.com/feed/
+https://www.materialshandling247.com/rss
+https://www.mmh.com/rss
+
+# Express / Parcel
+https://www.dhl.com/global-en/home/rss-newsroom.html
+https://newsroom.fedex.com/feed/
+https://about.ups.com/us/en/newsroom/rss.html
+
+# Semiconductor / AI / AIDC
 https://www.trendforce.com/rss
 https://www.digitimes.com/rss/daily.xml
 https://www.datacenterdynamics.com/en/rss/
+https://www.tomshardware.com/feeds/all
+https://www.servethehome.com/feed/
+https://www.anandtech.com/rss/
+https://www.techpowerup.com/rss/news
+https://www.hpcwire.com/feed/
+https://www.nextplatform.com/feed/
+https://www.semianalysis.com/feed/
+
+# Taiwan Tech / ODM
+https://www.cw.com.tw/rss
+https://www.bnext.com.tw/rss
+https://technews.tw/feed/
+https://www.eettaiwan.com/feed/
+https://news.cnyes.com/rss/news
+https://money.udn.com/rssfeed/news/1001/5590?ch=money
+
+# Data Center / Infrastructure
+https://www.datacenterknowledge.com/rss.xml
+https://www.networkworld.com/index.rss
+https://www.lightreading.com/rss.xml
+https://www.capacitymedia.com/rss
+https://www.telecoms.com/feed/
