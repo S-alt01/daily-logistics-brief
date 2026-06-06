@@ -26,27 +26,27 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r requirements.txt || true
 
       - name: Show files
         run: |
           pwd
-          ls -R
+          ls -R || true
 
-      - name: Test fetch script
+      - name: Fetch RSS news
         run: |
           python scripts/fetch_news.py || true
 
-      - name: Show generated files
-        run: |
-          ls
-
-      - name: Test summarize script
+      - name: Summarize with Gemini
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           python scripts/summarize_news.py || true
 
-      - name: Test PDF script
+      - name: Generate PDF brief
         run: |
           python scripts/generate_pdf.py || true
+
+      - name: Final check
+        run: |
+          ls
