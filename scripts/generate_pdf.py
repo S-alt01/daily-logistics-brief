@@ -1,50 +1,53 @@
 import json
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
+import traceback
 
-doc = SimpleDocTemplate("daily_brief.pdf")
+try:
 
-styles = getSampleStyleSheet()
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+    from reportlab.lib.styles import getSampleStyleSheet
 
-story = []
+    doc = SimpleDocTemplate("daily_brief.pdf")
 
-story.append(
-    Paragraph(
-        "Daily Logistics & AIDC Brief",
-        styles['Title']
-    )
-)
+    styles = getSampleStyleSheet()
 
-story.append(Spacer(1, 20))
-
-with open("summarized_news.json", "r", encoding="utf-8") as f:
-    news_items = json.load(f)
-
-for item in news_items[:3]:
-
-    title = str(item["title"]).encode("latin-1", "ignore").decode("latin-1")
-
-    analysis = str(item["analysis"]).encode(
-        "latin-1",
-        "ignore"
-    ).decode("latin-1")
+    story = []
 
     story.append(
         Paragraph(
-            title,
-            styles['Heading2']
-        )
-    )
-
-    story.append(
-        Paragraph(
-            analysis,
-            styles['BodyText']
+            "Daily Logistics & AIDC Brief",
+            styles['Title']
         )
     )
 
     story.append(Spacer(1, 20))
 
-doc.build(story)
+    with open("summarized_news.json", "r", encoding="utf-8") as f:
+        news_items = json.load(f)
 
-print("PDF generated")
+    for item in news_items[:1]:
+
+        story.append(
+            Paragraph(
+                "TEST TITLE",
+                styles['Heading2']
+            )
+        )
+
+        story.append(
+            Paragraph(
+                "TEST ANALYSIS",
+                styles['BodyText']
+            )
+        )
+
+    doc.build(story)
+
+    with open("pdf_debug.txt", "w") as f:
+        f.write("PDF SUCCESS")
+
+except Exception as e:
+
+    with open("pdf_debug.txt", "w") as f:
+        f.write(str(e))
+        f.write("\n\n")
+        f.write(traceback.format_exc())
