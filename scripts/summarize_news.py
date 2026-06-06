@@ -1,53 +1,38 @@
 import json
-import os
 import google.generativeai as genai
+import os
 
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-model = genai.GenerativeModel("gemini-2.5-flash")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 with open("news.json", "r", encoding="utf-8") as f:
-    news_items = json.load(f)
+    news = json.load(f)
 
-summarized_news = []
+summarized = []
 
-for item in news_items[:50]:
+for item in news[:5]:
 
     prompt = f"""
-You are a logistics and AIDC industry analyst.
+    Summarize this logistics/AIDC news in Traditional Chinese.
 
-Summarize this news in Traditional Chinese.
+    Title:
+    {item['title']}
 
-Return format:
+    Provide:
+    1. Summary
+    2. Market impact
+    """
 
-1. AI Summary
-2. Market Impact
+    response = model.generate_content(prompt)
 
-News Title:
-{item['title']}
-
-News Summary:
-{item['summary']}
-"""
-
-    try:
-
-        response = model.generate_content(prompt)
-
-        summarized_news.append({
-            "title": item["title"],
-            "link": item["link"],
-            "source": item["source"],
-            "published": item["published"],
-            "analysis": response.text
-        })
-
-        print("DONE:", item["title"])
-
-    except Exception as e:
-        print("ERROR:", e)
+    summarized.append({
+        "title": item["title"],
+        "link": item["link"],
+        "analysis": response.text
+    })
 
 with open("summarized_news.json", "w", encoding="utf-8") as f:
-    json.dump(summarized_news, f, ensure_ascii=False, indent=2)
+    json.dump(summarized, f, ensure_ascii=False, indent=2)
 
-print("Saved summarized news.")
+print("summarized_news.json generated")
