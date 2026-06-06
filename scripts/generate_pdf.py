@@ -108,7 +108,7 @@ with open(
     news_items = json.load(f)
 
 # =========================================
-# TOP 5 Summary
+# TOP 5 KEY SIGNALS
 # =========================================
 
 story.append(
@@ -124,7 +124,7 @@ for item in news_items[:5]:
 
     signal = item.get(
         "key_signal",
-        "Market momentum remains active."
+        "Market conditions remain dynamic."
     )
 
     story.append(
@@ -165,10 +165,17 @@ for category in categories:
 
     story.append(Spacer(1, 12))
 
-    category_items = [
-        item for item in news_items
-        if item.get("category") == category
-    ]
+    category_items = []
+
+    for item in news_items:
+
+        item_category = item.get(
+            "category",
+            "Other Logistics"
+        )
+
+        if item_category == category:
+            category_items.append(item)
 
     # =====================================
     # If No News
@@ -193,23 +200,42 @@ for category in categories:
 
     for item in category_items:
 
+        title = item.get(
+            "title",
+            "Untitled News"
+        )
+
+        analysis = item.get(
+            "analysis",
+            "No analysis available."
+        )
+
+        chinese_summary = item.get(
+            "chinese_summary",
+            ""
+        )
+
+        link = item.get(
+            "link",
+            ""
+        )
+
+        # =================================
         # Title
+        # =================================
 
         story.append(
             Paragraph(
-                item["title"],
+                title,
                 heading_style
             )
         )
 
         story.append(Spacer(1, 6))
 
+        # =================================
         # Chinese Summary
-
-        chinese_summary = item.get(
-            "chinese_summary",
-            ""
-        )
+        # =================================
 
         if chinese_summary:
 
@@ -222,27 +248,33 @@ for category in categories:
 
             story.append(Spacer(1, 8))
 
+        # =================================
         # English Analysis
+        # =================================
 
         story.append(
             Paragraph(
-                item["analysis"],
+                analysis,
                 body_style
             )
         )
 
         story.append(Spacer(1, 8))
 
+        # =================================
         # Link
+        # =================================
 
-        story.append(
-            Paragraph(
-                f"<font color='blue'>{item['link']}</font>",
-                body_style
+        if link:
+
+            story.append(
+                Paragraph(
+                    f"<font color='blue'>{link}</font>",
+                    body_style
+                )
             )
-        )
 
-        story.append(Spacer(1, 20))
+            story.append(Spacer(1, 20))
 
 # =========================================
 # Build PDF
