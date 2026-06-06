@@ -1,11 +1,55 @@
 name: Daily Brief
 
 on:
+  schedule:
+    # 北京/台北时间 07:00
+    # GitHub Actions 使用 UTC
+    - cron: "0 23 * * *"
+
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo "Workflow OK"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Fetch RSS news
+        run: |
+          python scripts/fetch_news.py
+
+      - name: Summarize with Gemini
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python scripts/summarize_news.py
+
+      - name: Generate PDF brief
+        run: |
+          python scripts/generate_pdf.py
+
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+
+          git add .
+
+          git commit -m "Daily brief update" || echo "No changes"
+
+          git push
