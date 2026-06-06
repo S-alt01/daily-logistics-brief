@@ -1,33 +1,29 @@
-import requests
+import json
 import os
 
-API_KEY = os.getenv("GEMINI_API_KEY")
+from google import genai
 
-url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
-
-headers = {
-    "Content-Type": "application/json"
-}
-
-data = {
-    "contents": [
-        {
-            "parts": [
-                {
-                    "text": "Say hello."
-                }
-            ]
-        }
-    ]
-}
-
-response = requests.post(
-    url,
-    headers=headers,
-    json=data
+client = genai.Client(
+    api_key=os.getenv("GEMINI_API_KEY")
 )
 
-with open("gemini_test.txt", "w", encoding="utf-8") as f:
-    f.write(response.text)
+with open("news.json", "r", encoding="utf-8") as f:
+    news = json.load(f)
 
-print(response.status_code)
+item = news[0]
+
+response = client.models.generate_content(
+    model="gemini-2.0-flash",
+    contents=f"Summarize this logistics news in simple English: {item['title']}"
+)
+
+summarized = [{
+    "title": item["title"],
+    "link": item["link"],
+    "analysis": response.text
+}]
+
+with open("summarized_news.json", "w", encoding="utf-8") as f:
+    json.dump(summarized, f, ensure_ascii=False, indent=2)
+
+print("summarized_news.json generated")
