@@ -1,36 +1,47 @@
 import json
 import google.generativeai as genai
 import os
+import traceback
 
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+try:
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+    genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-with open("news.json", "r", encoding="utf-8") as f:
-    news = json.load(f)
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
-summarized = []
+    with open("news.json", "r", encoding="utf-8") as f:
+        news = json.load(f)
 
-for item in news[:3]:
+    summarized = []
 
-    prompt = f"""
+    for item in news[:3]:
+
+        prompt = f"""
 请用简体中文简短总结下面新闻。
-
-不要使用 markdown 或特殊符号。
 
 新闻标题：
 {item['title']}
 """
 
-    response = model.generate_content(prompt)
+        response = model.generate_content(prompt)
 
-    summarized.append({
-        "title": item["title"],
-        "link": item["link"],
-        "analysis": response.text
-    })
+        summarized.append({
+            "title": item["title"],
+            "link": item["link"],
+            "analysis": response.text
+        })
 
-with open("summarized_news.json", "w", encoding="utf-8") as f:
-    json.dump(summarized, f, ensure_ascii=False, indent=2)
+    with open("summarized_news.json", "w", encoding="utf-8") as f:
+        json.dump(summarized, f, ensure_ascii=False, indent=2)
 
-print("summarized_news.json generated")
+    with open("summary_debug.txt", "w") as f:
+        f.write("SUMMARY SUCCESS")
+
+except Exception as e:
+
+    with open("summary_debug.txt", "w") as f:
+        f.write(str(e))
+        f.write("\n\n")
+        f.write(traceback.format_exc())
+
+    raise
