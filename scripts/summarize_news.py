@@ -16,13 +16,7 @@ for item in news[:3]:
     prompt = f"""
 请用简体中文简短总结下面新闻。
 
-不要使用：
-- emoji
-- markdown
-- 项目符号
-- 特殊符号
-
-只输出纯文字。
+不要使用 markdown 或特殊符号。
 
 新闻标题：
 {item['title']}
