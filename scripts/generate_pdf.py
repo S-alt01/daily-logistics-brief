@@ -42,12 +42,12 @@ with open("summarized_news.json", "r", encoding="utf-8") as f:
     news_items = json.load(f)
 
 # =========================================
-# EXECUTIVE SUMMARY
+# TOP 5 SUMMARY
 # =========================================
 
 story.append(
     Paragraph(
-        "EXECUTIVE INTELLIGENCE SUMMARY",
+        "TOP 5 SUMMARY",
         styles['Heading1']
     )
 )
@@ -119,46 +119,64 @@ for item in news_items:
 
     title = item["title"].lower()
 
-    # Express
+    # =====================================
+    # EXPRESS FIRST PRIORITY
+    # =====================================
+
     if any(word in title for word in [
         "dhl",
         "fedex",
         "ups",
-        "express"
+        "express",
+        "parcel",
+        "courier",
+        "last mile"
     ]):
         categories["Express"].append(item)
 
-    # Air Cargo
+    # =====================================
+    # AIR CARGO
+    # =====================================
+
     elif any(word in title for word in [
-        "air",
-        "cargo",
-        "airline",
+        "air cargo",
+        "air freight",
+        "cargo airline",
         "aviation"
     ]):
         categories["Air Cargo"].append(item)
 
-    # Ocean Freight
+    # =====================================
+    # OCEAN FREIGHT
+    # =====================================
+
     elif any(word in title for word in [
-        "ocean",
         "shipping",
-        "vessel",
         "container",
-        "port"
+        "port",
+        "vessel",
+        "ocean freight"
     ]):
         categories["Ocean Freight"].append(item)
 
+    # =====================================
     # AIDC
+    # =====================================
+
     elif any(word in title for word in [
-        "ai",
         "automation",
         "robot",
         "warehouse",
         "rfid",
-        "barcode"
+        "barcode",
+        "ai"
     ]):
         categories["AIDC"].append(item)
 
-    # Other Logistics
+    # =====================================
+    # OTHER
+    # =====================================
+
     else:
         categories["Other Logistics"].append(item)
 
@@ -168,9 +186,6 @@ for item in news_items:
 
 for category, items in categories.items():
 
-    if not items:
-        continue
-
     story.append(
         Paragraph(
             category.upper(),
@@ -179,6 +194,24 @@ for category, items in categories.items():
     )
 
     story.append(Spacer(1, 15))
+
+    # 如果没有内容
+    if not items:
+
+        story.append(
+            Paragraph(
+                "NIL",
+                styles['BodyText']
+            )
+        )
+
+        story.append(Spacer(1, 20))
+
+        continue
+
+    # =====================================
+    # NEWS ITEMS
+    # =====================================
 
     for item in items[:5]:
 
@@ -196,22 +229,6 @@ for category, items in categories.items():
         story.append(
             Paragraph(
                 item["analysis"],
-                styles['BodyText']
-            )
-        )
-
-        story.append(Spacer(1, 5))
-
-        # Implication
-        implication = """
-        <i>Implication:</i>
-        This development may influence logistics capacity,
-        supply chain efficiency, and regional freight activity.
-        """
-
-        story.append(
-            Paragraph(
-                implication,
                 styles['BodyText']
             )
         )
@@ -236,38 +253,6 @@ for category, items in categories.items():
         )
 
         story.append(Spacer(1, 18))
-
-# =========================================
-# WATCHLIST
-# =========================================
-
-story.append(
-    Paragraph(
-        "WATCHLIST",
-        styles['Heading1']
-    )
-)
-
-story.append(Spacer(1, 12))
-
-watch_items = [
-    "• Red Sea shipping developments",
-    "• US-China tariff policy changes",
-    "• Air cargo pricing movement",
-    "• Warehouse robotics adoption trends",
-    "• Global port congestion indicators"
-]
-
-for watch in watch_items:
-
-    story.append(
-        Paragraph(
-            watch,
-            styles['BodyText']
-        )
-    )
-
-    story.append(Spacer(1, 6))
 
 doc.build(story)
 
